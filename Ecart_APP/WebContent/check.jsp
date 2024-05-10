@@ -25,14 +25,35 @@
             padding: 10px 20px;
             text-align: center;
         }
+        nav {
+		  display: inline-block;
+		}
+		nav button {
+		  background-color: #333;
+		  color: white;
+		  border: none;
+		  padding: 10px 20px;
+		  margin-right: 20px;
+		  cursor: pointer;
+		}
+		nav button:hover {
+		  background-color: #555;
+		  border-radius: 10px;
+		}
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            border-radius:10px;
+            border:3px;
         }
         th, td {
-            padding: 8px;
+            padding: 15px;
             text-align: left;
+            border-color: 2px solid #96D4D4;
+    
+            text-align:center;
+           
         }
         th {
             background-color: #f2f2f2;
@@ -76,6 +97,10 @@
 <body>
 	<header>
         <h1>Shopping Cart</h1>
+        <nav>
+	      <button onclick="openHomePage()">Home</button>
+	      <button onclick="openCart()">Cart</button>
+        </nav>
       </header>
     <div class="container">
         <h2>Order Summary</h2>
@@ -112,7 +137,7 @@
         </table>
         
         <div class="pymt">
-            <p id ="prc"><b>total Products Price: <%= (Double)session.getAttribute("Price")%> </b></p>
+            <p id ="prc"><b>Total Products Price: <%= (Double)session.getAttribute("Price")%> </b></p>
 	        <p><b>Shipping Charge: <%= df.format(ship)%></b></p>
 	        <p><b>Total Amount : <%= (Double)session.getAttribute("Price") + Double.parseDouble(df.format(ship)) %> </b></p>
 	        <div class="btn"><button id="razorpayBtn">Pay Now</button></div>
@@ -134,11 +159,13 @@
             "handler": function (response) {
                 // Handle success response
                 alert('Payment successful: ' + response.razorpay_payment_id);
+                
+                
             },
             "prefill": {
-                "name": "RamBabu",
+                "name": "M harish",
                 "email": "customer@example.com",
-                "contact": "9965847103"
+                "contact": "9346237652"
             },
             "theme": {
                 "color": "#007bff"
@@ -148,6 +175,13 @@
         var rzp = new Razorpay(options);
         rzp.open();
     });
+    
+    function openCart(){
+  	  window.open("cart.html", "_self");
+  	}
+  	function openHomePage() {
+  	  window.open("home.html", "_self");
+  	}
 </script>
     
 </body>

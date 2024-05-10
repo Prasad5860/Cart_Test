@@ -8,7 +8,7 @@ import Modal.Product;
 public interface conatractOb {
 	List<Product> get();
 
-	List<Product> getprd(int id);
+	List<Product> getprd(String ct);
 
 	List<Catogery> cat_get();
 

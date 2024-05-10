@@ -56,19 +56,9 @@ public class CateWise extends HttpServlet {
 		conatractOb cb = null;
 		DataOject d = new DataOject();
 		cb = d.getobject();
-
-		try {
-			if (cat.equals("all")) {
-				lp = cb.get();
-				System.out.println("category Id = " + cat);
-			} else {
-				lp = cb.getprd(Integer.parseInt(cat));
-			}
-			response.setContentType("application/json");
-			response.getWriter().write(new Gson().toJson(lp));
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
+		lp = cb.getprd(cat);
+		response.setContentType("application/json");
+		response.getWriter().write(new Gson().toJson(lp));
 
 	}
 

@@ -32,8 +32,12 @@ public class ShopData implements conatractOb {
 	}
 
 	@Override
-	public List<Product> getprd(int id) {
+	public List<Product> getprd(String ct) {
 		try {
+			if ("all".equals(ct)) {
+				return get();
+			}
+			int id = Integer.parseInt(ct);
 			Connection con = dbCon.initialize();
 			PreparedStatement ps = con.prepareCall("select * from H_products where pcatid = ?");
 			ps.setInt(1, id);
@@ -66,21 +70,6 @@ public class ShopData implements conatractOb {
 			System.out.println(e.getMessage());
 		}
 		return null;
-	}
-
-	public static List<Product> getdata(ResultSet rs) throws SQLException {
-		List<Product> lp = new ArrayList<>();
-		while (rs.next()) {
-			Product p = new Product();
-			p.setProductId(rs.getInt(1));
-			p.setProductName(rs.getString(2));
-			p.setProductPrice(rs.getDouble(3));
-			p.setHSNCode(rs.getString(4));
-			p.setProductCategory(rs.getString(5));
-			p.setProductImageId(rs.getString(6));
-			lp.add(p);
-		}
-		return lp;
 	}
 
 	@Override
@@ -162,6 +151,21 @@ public class ShopData implements conatractOb {
 			System.out.println(e.getMessage());
 		}
 		return null;
+	}
+
+	public static List<Product> getdata(ResultSet rs) throws SQLException {
+		List<Product> lp = new ArrayList<>();
+		while (rs.next()) {
+			Product p = new Product();
+			p.setProductId(rs.getInt(1));
+			p.setProductName(rs.getString(2));
+			p.setProductPrice(rs.getDouble(3));
+			p.setHSNCode(rs.getString(4));
+			p.setProductCategory(rs.getString(5));
+			p.setProductImageId(rs.getString(6));
+			lp.add(p);
+		}
+		return lp;
 	}
 
 }
