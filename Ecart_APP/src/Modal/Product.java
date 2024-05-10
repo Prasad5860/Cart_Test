@@ -9,6 +9,7 @@ public class Product {
 	private String productImageId;
 	private String quantity;
 	private double gst;
+	private double shippingCharge;
 
 	public void setHSNCode(String HSNCode) {
 		this.HSNCode = HSNCode;
@@ -48,6 +49,14 @@ public class Product {
 
 	public double getGst() {
 		return gst;
+	}
+
+	public double getShippingCharge() {
+		return shippingCharge;
+	}
+
+	public void setShippingCharge(double shipping) {
+		this.shippingCharge = shipping;
 	}
 
 	public void setProductPrice(double productPrice) {

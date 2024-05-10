@@ -56,12 +56,14 @@ public class chekOut extends HttpServlet {
 
 		System.out.println(ag.get(0).getGst());
 
-		double tot_price = cb.getPriceAll(ag);
+		double tot_price = calculate.getPriceAll(ag);
 		System.out.println(tot_price);
 		double shippingCharge = calculate.cal(tot_price);
 
+		List<Product> products = calculate.getCharges(ag, shippingCharge, tot_price);
+
 		HttpSession session = request.getSession();
-		session.setAttribute("Products", ag);
+		session.setAttribute("Products", products);
 		session.setAttribute("Price", tot_price);
 		session.setAttribute("shipCharge", shippingCharge);
 

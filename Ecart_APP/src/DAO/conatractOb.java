@@ -12,11 +12,9 @@ public interface conatractOb {
 
 	List<Catogery> cat_get();
 
-	List<Product> priceGet(int l, int h);
+	List<Product> priceGet(String cat, String srt);
 
 	List<Product> validatePin(int cat, int pin);
 
 	List<Product> totalGST(List<Product> p);
-
-	double getPriceAll(List<Product> p);
 }

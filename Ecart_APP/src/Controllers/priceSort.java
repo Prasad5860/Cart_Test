@@ -41,17 +41,18 @@ public class priceSort extends HttpServlet {
 		response.setHeader("Access-Control-Allow-Headers",
 				"Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 		response.setHeader("Access-Control-Allow-Credentials", "true");
-		response.getWriter().append("Served at: ").append(request.getContextPath());
 
-		int low = Integer.parseInt(request.getParameter("from"));
-		int high = Integer.parseInt(request.getParameter("from"));
+		String cat = request.getParameter("cat");
+		String srt = request.getParameter("srt");
 
 		List<Product> lp = null;
 		conatractOb cb = null;
 		DataOject d = new DataOject();
 		cb = d.getobject();
 
-		lp = cb.priceGet(low, high);
+		lp = cb.priceGet(cat, srt);
+
+		System.out.println("Price" + lp);
 		response.setContentType("application/json");
 		response.getWriter().write(new Gson().toJson(lp));
 

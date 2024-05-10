@@ -1,10 +1,12 @@
 package DataLayer;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,15 +84,25 @@ public class ShopData implements conatractOb {
 	}
 
 	@Override
-	public List<Product> priceGet(int l, int h) {
+	public List<Product> priceGet(String cat, String srt) {
 		// TODO Auto-generated method stub
 
 		Connection cn = dbCon.initialize();
 		try {
-			Connection con = dbCon.initialize();
-			PreparedStatement ps = con.prepareCall("select * from H_products where price>? and price<=?");
-			ps.setInt(1, l);
-			ps.setInt(2, h);
+			PreparedStatement ps = null;
+			String sql = "select * from H_products order by price";
+			System.out.println(cat + " " + srt);
+			if (!"all".equals(cat)) {
+				sql = "select * from H_products where pcatid=? order by price";
+			}
+			if ("hight".equals(srt)) {
+				sql += " DESC";
+			}
+			System.out.println("Query  " + sql);
+			ps = cn.prepareStatement(sql);
+			if (!"all".equals(cat)) {
+				ps.setInt(1, Integer.parseInt(cat));
+			}
 			ResultSet rs = ps.executeQuery();
 			return getdata(rs);
 		} catch (Exception e) {
@@ -133,47 +145,23 @@ public class ShopData implements conatractOb {
 
 	@Override
 	public List<Product> totalGST(List<Product> p) {
-		// TODO Auto-generated method stub
 		try {
 			Connection cn = dbCon.initialize();
-			PreparedStatement ps = null;
-			ResultSet rs = null;
+			CallableStatement cs = null;
 			for (Product product : p) {
-				int gst;
 				int id = product.getProductId();
-				ps = cn.prepareStatement("select hsn_code from H_products where pid = ?");
-				ps.setInt(1, id);
-				rs = ps.executeQuery();
-				if (rs.next()) {
-					String code = rs.getString(1);
-					ps = cn.prepareStatement("select gst from H_hsncode where hsn_code = ?");
-					ps.setString(1, code);
-					rs = ps.executeQuery();
-					if (rs.next()) {
-						gst = rs.getInt(1);
-						product.setGst(gst);
-					}
-				}
+				cs = cn.prepareCall("{? = call GetGSTForProductt_203(?)}");
+				cs.registerOutParameter(1, Types.INTEGER);
+				cs.setInt(2, id);
+				cs.execute();
+				int gst = cs.getInt(1);
+				product.setGst(gst);
 			}
 			return p;
-
 		} catch (Exception e) {
-			// TODO: handle exception
 			System.out.println(e.getMessage());
 		}
 		return null;
-
-	}
-
-	@Override
-	public double getPriceAll(List<Product> p) {
-		// TODO Auto-generated method stub
-
-		double price = 0.0;
-		for (Product product : p) {
-			price += product.getProductPrice() + product.getGst();
-		}
-		return price;
 	}
 
 }
