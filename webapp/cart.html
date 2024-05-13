@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<title>Cart</title>
+<style>
+    body {
+    padding-top: 4rem;
+}
+
+.navbar-nav .nav-link {
+    color: white;
+    margin-right: 1rem;
+}
+
+.navbar-nav .nav-link:hover {
+    color: gray;
+}
+
+.navbar-brand {
+    margin-right: 2rem;
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+}
+nav {
+    display: inline-block;
+}
+nav button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-right: 20px;
+    cursor: pointer;
+}
+nav button:hover {
+    background-color: #555;
+    border-radius: 10px;
+}
+
+	#cart{
+	display:flex;
+	flex-wrap: wrap;
+	}
+.cart-item {
+    margin-top: 30px;
+    display: flex;
+    padding: 10px;
+    width:650px;
+    margin-left: 10px;
+    margin-right:10px;
+    border-radius: 20px;
+    border: 1px solid;
+    box-shadow: 5px 10px 18px #888888;
+}
+
+.cart-item img {
+    max-width: 120px;
+    max-height: 120px;
+    margin-right: 10px;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.cart-item-quantity {
+    margin-right: 10px;
+}
+
+.cart-item-remove {
+    display:block;
+    cursor: pointer;
+    color: red;
+    height: 40px;
+    border-radius: 10px;
+    margin-top:110px;
+}
+.cart-item-remove:hover {
+    border: 1px solid black;
+}
+.buy{
+display: flex;
+align-items: center;
+justify-content: center;
+margin:20px;
+}
+.buy button{
+padding:20px;
+background-color: coral;
+border-radius: 15px;
+cursor: pointer;
+}
+
+/* Plus and minus buttons */
+.cart-item-details button {
+background-color: #f0f0f0;
+border: none;
+color: #333;
+font-weight: bold;
+padding: 5px 10px;
+margin: 0 5px;
+border-radius: 5px;
+cursor: pointer;
+}
+
+.cart-item-details button:hover {
+background-color: #ccc;
+}
+
+/* Quantity display */
+.cart-item-details span {
+font-weight: bold;
+margin: 0 5px;
+}
+
+
+
+@media screen and (max-width: 600px) {
+    .cart-item {
+        flex-direction: column;
+    }
+
+    .cart-item img {
+        margin: 0 auto 10px;
+    }
+}
+</style>
+</head>
+<body>
+    <header>
+        <h1>Shopping Cart</h1>
+        <nav>
+          <button onclick="openHomePage()">Home</button>
+          <button id="crt">Cart</button>
+        </nav>
+      </header>
+<div id="cart">
+    <!-- Sample cart items -->
+    
+</div>
+
+
+<script>
+$(document).ready(function(){
+    $('#cart').empty()
+    let arr = JSON.parse(localStorage.getItem("arr")) || [];
+    arr.forEach(item => {
+        var pdiv = '<div class="cart-item">' +
+                    '<img src="' + item.productImageId + '" alt="' + item.productName + '">' +
+                    '<div class="cart-item-details">' +
+                    '<h1>' + item.productName + '</h1>' +
+                    '<p><b>Price</b>: ' + item.productPrice + '</p>' +
+                    '<p><b>Quantity:</b> ' +
+                    '<button onclick="decrementQuantity(\'' + item.productId + '\')">-</button>' +
+                    '<span id="quantity-' + item.productId + '">' + item.quantity + '</span>' +
+                    '<button onclick="incrementQuantity(\'' + item.productId + '\')">+</button>' +
+                    '</p>' +
+                    '</div>' +
+                    '<button class="cart-item-remove" onclick="RemoveItem(\'' + item.productId + '\')">Remove</button>' +
+                    '</div>';
+
+            $('#cart').append(pdiv);
+    })
+    $('body').append('<div class="buy">'+'<button id ="Buy">CheckOut</button>'+'</div>')
+
+    $(document).on('click', '.cart-item-remove', function() {
+        $(this).closest('.cart-item').remove();
+    });
+
+
+    $(document).on('click','#Buy',function(){
+        let ar = localStorage.getItem('arr') || [];
+        console.log(JSON.stringify(ar));
+        $.ajax({
+            url : 'http://localhost:8080/Shooping_App/chekOut',
+            type : 'GET',
+            data : {
+                // 'arr' : JSON.stringify(ar)
+                'arr' : ar
+            },
+            success: function(response){
+                window.location.href = "check.jsp";
+            },
+            error: function(error){
+                console.log(error);
+            }
+
+        })
+    })
+
+
+
+
+
+})
+   function RemoveItem(id){
+        console.log(id)
+        let arr = JSON.parse(localStorage.getItem("arr")) || [];
+        let found = false;
+        arr.forEach((item, index) => {
+            if (item.productId == id) {
+                arr.splice(index, 1);
+                localStorage.setItem("arr", JSON.stringify(arr));
+            }
+        });
+        if(arr.length == 0){
+            alert("CART IS EMPTY");
+        }
+    }
+
+
+    function incrementQuantity(id) {
+        let arr = JSON.parse(localStorage.getItem("arr")) || [];
+        arr.forEach(item => {
+            if (item.productId == id) {
+                item.quantity++;
+                localStorage.setItem("arr", JSON.stringify(arr));
+                $('#quantity-' + id).text(item.quantity);
+            }
+        });
+
+    }
+
+    function decrementQuantity(id) {
+        let arr = JSON.parse(localStorage.getItem("arr")) || [];
+        arr.forEach(item => {
+            if (item.productId == id && item.quantity > 1) {
+                item.quantity--;
+                localStorage.setItem("arr", JSON.stringify(arr));
+                $('#quantity-' + id).text(item.quantity);
+            }
+        });
+    }
+
+    function openHomePage() {
+        window.open("home.html", "_self");
+    }
+</script>
+
+</body>
+</html>

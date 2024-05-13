@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <title>Shopping Cart</title>
+  
+  <style>
+  
+  	/* styles.css */
+body {
+  padding-top: 4rem;
+}
+
+.navbar-nav .nav-link {
+  color: white;
+  margin-right: 1rem;
+}
+
+.navbar-nav .nav-link:hover {
+  color: gray;
+}
+
+.navbar-brand {
+  margin-right: 2rem;
+}
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+}
+nav {
+  display: inline-block;
+}
+nav button {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-right: 20px;
+  cursor: pointer;
+}
+nav button:hover {
+  background-color: #555;
+  border-radius: 10px;
+}
+
+select {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+select option {
+  padding: 8px;
+}
+
+.product {
+  border-radius: 10px;
+  border: 1px solid;
+  box-shadow: 5px 10px 18px #888888;
+  padding: 20px;
+  margin: 10px;
+  width: 220px;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.product:hover {
+  box-shadow: 5px 10px 8px #888888;
+  border-radius: 20px;
+
+}
+.product img {
+  max-width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+.product-info {
+  margin-top: 10px;
+}
+.product-info button {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.product-info button:hover {
+  background-color: #555;
+}
+.options{
+  padding: 5px;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+.options select{
+  display: block;
+}
+
+
+  	
+  
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Shopping Cart</h1>
+    <nav>
+      <button onclick="openHomePage()">Home</button>
+      <button onclick="openCart()">Cart</button>
+    </nav>
+  </header>
+
+  <div class="options">
+    <select id="category-select">
+      <option value="all">All Categories</option>
+      <!-- Add more categories as needed -->
+    </select>
+    <select id="sort">
+      <option value="all" selected>Sort By Price</option>
+      <option value="hight">High to low</option>
+      <option value="low">low to High</option>
+    </select>
+  </div>
+ 
+<div class="Product_list">
+    
+</div>
+
+<script>
+
+$(document).ready(function() {
+
+	  // CATEGORY OPTIONS
+
+	  $.ajax({
+	    url:"http://localhost:8080/Shooping_App/Catogeries",
+	    type: "GET",
+	    dataType:"json",
+	    success: function(data){
+	      $.each(data,function(ind,ele){
+	        let el = '<option value ="'+ele.id+'">'+ele.name+'</option>'
+	        $('#category-select').append(el)
+	      })
+	    }
+	  })
+
+	  // ALL PRODUCTS
+
+	  $.ajax({
+	    url: "http://localhost:8080/Shooping_App/allProducts",
+	    type: "GET",
+	    dataType: "json",
+	    success: function(data) {
+	      if ($('#category-select').is(":hidden")) {
+	          $('#category-select').show()
+	      }
+	      $.each(data, function(index, product) {
+	        console.log( product.productName);
+	        var productDiv = '<div class="product">' +
+	                            '<div class="product-info">' +
+	                                '<img src="' + product.productImageId + '" alt="' + product.productName + '">' +
+	                              '<h2>' + product.productName + '</h2>' +
+	                              '<p>Price: ' + product.productPrice + '</p>' +
+	                              '<button onclick="addToCart(\'' + product.productName + '\', ' + product.productPrice + ', \'' + product.productImageId + '\', ' + product.productId + ', \'' + product.productCategory + '\')">Add to Cart</button>' +
+	                            '</div>' +
+	                          '</div>';
+	        $('.Product_list').append(productDiv);
+	      });
+	    },
+	    error: function(xhr, status, error) {
+	      console.error("Error fetching products: " + error);
+	    }
+	  });
+
+	    //CATEGORY WISE PRODUCTS
+	  
+
+	  $('#category-select').change(function(){
+	    $('.Product_list').empty();
+	    let cat_id =  $('#category-select').val()
+	    $.ajax({
+	      url:"http://localhost:8080/Shooping_App/CateWise",
+	      type: "POST",
+	      data:{
+	        id: cat_id
+	      },
+	      success: function(data) {
+	              $.each(data, function(index, product) {
+	              console.log( product.productName);
+	              var productDiv = '<div class="product">' +
+	                                  '<div class="product-info">' +
+	                                      '<img src="' + product.productImageId + '" alt="' + product.productName + '">' +
+	                                      '<h2>' + product.productName + '</h2>' +
+	                                      '<p>Price: $' + product.productPrice + '</p>' +
+	                                      '<button onclick="addToCart(\'' + product.productName + '\', ' + product.productPrice + ', \'' + product.productImageId + '\', ' + product.productId + ', \'' + product.productCategory + '\')">Add to Cart</button>' +
+	                                  '</div>' +
+	                                  '</div>';
+	              $('.Product_list').append(productDiv);
+	              });
+	          },
+	      error: function(xhr, status, error) {
+	          console.error("Error fetching products: " + error);
+	      }
+	    })
+	  });
+
+
+	  //Price sort
+
+	  $('#sort').change(function(){
+	    $('.Product_list').empty();
+	    var cat = $('#category-select').val();
+	    var srt = $('#sort').val();
+	    console.log(cat,srt)
+	    $.ajax({
+	      url:'http://localhost:8080/Shooping_App/priceSort',
+	      type:'POST',
+	      dataType: "json",
+	      data:{
+	        cat: cat,
+	        srt:srt
+	      },
+	      success:function(data){
+	        $.each(data, function(index, product) {
+	          var productDiv = '<div class="product">' +
+	                              '<div class="product-info">' +
+	                                  '<img src="' + product.productImageId + '" alt="' + product.productName + '">' +
+	                                  '<h2>' + product.productName + '</h2>' +
+	                                  '<p>Price: ' + product.productPrice + '</p>' +
+	                                  '<button onclick="addToCart(\'' + product.productName + '\', ' + product.productPrice + ', \'' + product.productImageId + '\', ' + product.productId + ', \'' + product.productCategory + '\')">Add to Cart</button>' +
+	                              '</div>' +
+	                              '</div>';
+	          $('.Product_list').append(productDiv);
+	          });
+	      },
+	      error:  function(xhr, status, error) {
+	              console.error("Error fetching products: " + error);
+	            }
+	    })
+
+	  })
+
+	})
+
+
+
+	function addToCart(name, price, img, id,categoryId) {
+	  let pincode = prompt("Enter Pincode:");
+	  if (!pincode) {
+	      return; // User canceled or didn't enter a pincode
+	  }
+
+	  // Check if the item category is available for the entered pincode
+	  $.ajax({
+	      url: "http://localhost:8080/Shooping_App/PinValidate",
+	      type: 'GET',
+	      data: { categoryId: categoryId, pincode: pincode },
+	      success: function(response) {
+	          if (response) {
+	              // Item is available, proceed to add to cart
+	              let arr = JSON.parse(localStorage.getItem("arr")) || [];
+	              let found = false;
+
+	              arr.forEach(item => {
+	                  if (item.productId === id) {
+	                      item.quantity = (item.quantity || 1) + 1;
+	                      found = true;
+	                  }
+	              });
+
+	              if (!found) {
+	                  arr.push({ productId: id, productName: name, productPrice: price, productImageId: img, productCategory: categoryId, quantity: 1 });
+	              }
+	              localStorage.setItem("arr", JSON.stringify(arr));
+	              alert("Item Added to cart")
+	          } else {
+	              alert("Item not available for the entered pincode and category.");
+	          }
+	      },
+	      error: function(xhr, status, error) {
+	          console.error('Error checking availability:', error);
+	          alert("An error occurred. Please try again.");
+	      }
+	  });
+	}
+
+	function openCart(){
+	  window.open("cart.html", "_self");
+	}
+	function openHomePage() {
+	  window.open("home.html", "_self");
+	}
+
+
+
+
+</script>
+  
+</body>
+</html>
